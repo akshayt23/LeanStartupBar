@@ -19,10 +19,11 @@ public class Chef implements Runnable {
 		
 		while (true) {
 			try { 
+				// Get order from queue and process
 				order = ordersQueue.take();
 				if (order != null) {
 					processOrder(order);
-					Thread.sleep(1000 * order.getPrepTime());
+					Thread.sleep(1000 * order.getPrepTime() * 60);
 					finishOrder(order);
 				}
 			} catch(InterruptedException e) {
@@ -34,14 +35,15 @@ public class Chef implements Runnable {
 	}
 	
 	public void processOrder(Order order) {
-		writeToFile("Chef : Picked up ORD" + order.getOrderNumber() + " at " + 
-				order.getTimeStamp());
+		String timeStamp = new SimpleDateFormat("hh:mm:ss a")
+								.format(Calendar.getInstance().getTime());
+		writeToFile("Chef : Picked up ORD" + order.getOrderNumber() + " at " + timeStamp);
 		writeToFile("Chef : Cooking " + order.getName() + "...");
 
 	}
 	
 	public void finishOrder(Order order) { 
-		String timeStamp = new SimpleDateFormat("HH:mm:ss")
+		String timeStamp = new SimpleDateFormat("hh:mm:ss a")
 								.format(Calendar.getInstance().getTime());
 		writeToFile("Chef : Finished making " + order.getName() + " for ORD" + 
 								order.getOrderNumber() + " at " + timeStamp);
@@ -60,7 +62,7 @@ public class Chef implements Runnable {
 			
 			fileWriter = new FileWriter(file.getAbsoluteFile(), true);
 			buffWriter = new BufferedWriter(fileWriter);
-			buffWriter.write(str);
+			buffWriter.write(str + "\n");
 			
 		} catch (IOException e) {
 			System.out.println("Could not write to file!");
